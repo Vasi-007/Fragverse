@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Contact FragVerse{% endblock %}
+
+{% block content %}
+<main class="contact-page">
+    <div class="container contact-shell">
+        <div class="contact-intro">
+            <div>
+                <p class="contact-eyebrow">FragVerse support</p>
+                <h1>Let's talk fragrance.</h1>
+                <p class="contact-lead">Questions about an order, a scent, or finding your next signature fragrance? Send us a message and our team will get back to you.</p>
+            </div>
+            <a href="{% url 'home' %}" class="contact-home-link"><i class="fa-solid fa-arrow-left"></i> Back to home</a>
+        </div>
+
+        <div class="contact-layout">
+            <section class="contact-card">
+                <div class="contact-card-heading">
+                    <div><p class="contact-section-label">Send a message</p><h2>How can we help?</h2></div>
+                    <span class="contact-secure"><i class="fa-solid fa-lock"></i> Secure form</span>
+                </div>
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+                    <div class="contact-form-grid">
+                        <div class="contact-field"><label for="{{ form.full_name.id_for_label }}">Full name</label>{{ form.full_name }}{% if form.full_name.errors %}<div class="field-error">{{ form.full_name.errors.0 }}</div>{% endif %}</div>
+                        <div class="contact-field"><label for="{{ form.email.id_for_label }}">Email address</label>{{ form.email }}{% if form.email.errors %}<div class="field-error">{{ form.email.errors.0 }}</div>{% endif %}</div>
+                    </div>
+                    <div class="contact-field"><label for="{{ form.subject.id_for_label }}">Subject</label>{{ form.subject }}{% if form.subject.errors %}<div class="field-error">{{ form.subject.errors.0 }}</div>{% endif %}</div>
+                    <div class="contact-field"><label for="{{ form.message.id_for_label }}">Your message</label>{{ form.message }}{% if form.message.errors %}<div class="field-error">{{ form.message.errors.0 }}</div>{% endif %}</div>
+                    <button type="submit" class="send-message-btn">Send message <i class="fa-solid fa-arrow-right"></i></button>
+                </form>
+            </section>
+
+            <aside class="contact-info-card">
+                <p class="contact-section-label">Contact details</p><h2>We're here for you.</h2>
+                <div class="contact-info-list">
+                    <a href="mailto:support@fragverse.com" class="contact-info-item"><span class="contact-info-icon"><i class="fa-solid fa-envelope"></i></span><span><small>Email us</small>support@fragverse.com</span></a>
+                    <a href="tel:+919778769322" class="contact-info-item"><span class="contact-info-icon"><i class="fa-solid fa-phone"></i></span><span><small>Call us</small>+91 97787 69322</span></a>
+                    <div class="contact-info-item"><span class="contact-info-icon"><i class="fa-solid fa-location-dot"></i></span><span><small>Visit us</small>Palakkad, Kerala, India</span></div>
+                </div>
+                <div class="contact-hours"><span class="contact-status-dot"></span><span><strong>Support hours</strong>Monday - Saturday, 9:00 AM - 6:00 PM</span></div>
+            </aside>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Orders
+{% endblock %}
+
+{% block content %}
+
+<main class="orders-page">
+<div class="container orders-shell">
+
+    <div class="orders-header">
+
+        <div>
+
+            <p class="orders-eyebrow">Account overview</p>
+            <h1>My orders</h1>
+
+            <p class="text-muted mb-0">
+                View your perfume order history.
+            </p>
+
+        </div>
+
+        <a href="{% url 'shop' %}" class="orders-shop-link">
+
+            <i class="fa-solid fa-bag-shopping me-2"></i>
+
+            Continue Shopping
+
+        </a>
+
+    </div>
+
+    {% if orders %}
+
+    <div class="orders-panel">
+
+        <div class="orders-panel-body">
+
+            <div class="orders-count">
+                <span>Total orders</span>
+                <strong>{{ orders.count }}</strong>
+
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table orders-table align-middle">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Order ID</th>
+
+                            <th>Date</th>
+
+                            <th>Status</th>
+
+                            <th>Total</th>
+
+                            <th class="text-center">Action</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for order in orders %}
+
+                        <tr>
+
+                            <td>
+
+                                <strong>#{{ order.order_number }}</strong>
+
+                            </td>
+
+                            <td>
+
+                                {{ order.created|date:"d M Y" }}
+
+                            </td>
+
+                            <td>
+
+                                <span class="order-status-badge">
+
+                                    {{ order.status }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <strong>₹{{ order.total }}</strong>
+
+                            </td>
+
+                            <td class="text-center">
+
+                                          <a href="{% url 'order_detail' order.id %}"
+
+                                               class="order-details-link js-order-details"
+                                              data-order-source="order-source-{{ order.id }}">
+
+                                    <i class="fa-solid fa-eye me-1"></i>
+
+                                    View Details
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        <template id="order-source-{{ order.id }}">
+                            <div class="order-modal-summary">
+                                <div><span>Order number</span><strong>#{{ order.order_number }}</strong></div>
+                                <div><span>Placed on</span><strong>{{ order.created|date:"d M Y, h:i A" }}</strong></div>
+                                <div><span>Status</span><strong class="order-modal-status">{{ order.status }}</strong></div>
+                                <div><span>Total</span><strong>₹{{ order.total }}</strong></div>
+                            </div>
+                            <div class="order-modal-section"><h6>Items in this order</h6>
+                                {% for item in order.items.all %}
+                                    <div class="order-modal-item"><div><strong>{{ item.product.name }}</strong><span>{{ item.quantity }} × ₹{{ item.price }}</span></div><strong>Qty {{ item.quantity }}</strong></div>
+                                {% endfor %}
+                            </div>
+                            <div class="order-modal-address"><i class="fa-solid fa-location-dot"></i><span><strong>Delivery address</strong>{{ order.address }}, {{ order.city }}, {{ order.state }} {{ order.postal_code }}</span></div>
+                        </template>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="orders-empty-state">
+
+        <div class="orders-empty-body">
+
+            <i class="fa-solid fa-box-open fa-4x text-secondary mb-3"></i>
+
+            <h2>No orders yet</h2>
+
+            <p class="text-muted">
+
+                You haven't placed any orders yet.
+
+            </p>
+
+            <a href="{% url 'shop' %}" class="orders-shop-link">
+
+                <i class="fa-solid fa-bag-shopping me-2"></i>
+
+                Start Shopping
+
+            </a>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+</main>
+
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content order-details-modal">
+            <div class="modal-header">
+                <div><p class="order-modal-eyebrow">Your purchase</p><h5 class="modal-title" id="orderDetailsModalLabel">Order details</h5></div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="orderDetailsModalBody"></div>
+            <div class="modal-footer"><button type="button" class="btn order-modal-close" data-bs-dismiss="modal">Close</button></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

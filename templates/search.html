@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}
+Search Results
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h2 class="mb-3">Search Results</h2>
+
+    <p class="mb-4">Showing results for<strong>"{{ query }}"</strong></p>
+
+    <div class="shop-product-grid">
+
+        {% for product in products %}
+
+            <article class="shop-product-card">
+                <div class="shop-product-image-wrap">
+                    <a href="{% url 'product_detail' product.name|slugify %}" class="shop-product-image-link">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                    </a>
+                    {% if product.stock > 0 %}
+                        <span class="shop-stock-badge in-stock">In Stock</span>
+                    {% else %}
+                        <span class="shop-stock-badge out-of-stock">Out of Stock</span>
+                    {% endif %}
+                </div>
+
+                <div class="shop-product-body">
+                    <a href="{% url 'product_detail' product.name|slugify %}" class="shop-product-name-link">
+                        <h3>{{ product.name }}</h3>
+                    </a>
+                    <p class="shop-product-brand">{{ product.brand }}</p>
+                    <div class="shop-product-price-row">
+                        {% with offer=product.active_offer discounted_price=product.display_price %}
+                            {% include "partials/price_display.html" with original_price=product.price discounted_price=discounted_price offer=offer %}
+                        {% endwith %}
+                    </div>
+
+                    <div class="shop-product-actions">
+                        <a href="{% url 'add_to_wishlist' product.id %}"
+                        class="shop-wishlist-btn js-wishlist-btn {% if product.id in wishlist_product_ids %}is-active{% endif %}"
+                        title="Add to Wishlist">
+
+                            {% if product.id in wishlist_product_ids %}
+
+                                <i class="fa-solid fa-heart"></i>
+
+                            {% else %}
+
+                                <i class="fa-regular fa-heart"></i>
+
+                            {% endif %}
+
+                        </a>
+
+                        <form method="post" action="{% url 'cart_add' product.id %}" class="js-add-to-cart-form shop-cart-form">
+                            {% csrf_token %}
+                            {% include "partials/cart_variant_options.html" with variants=product.variants.all %}
+                            <button type="submit" class="shop-add-cart-btn">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                Add to Cart
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+
+        {% empty %}
+
+        <div class="col-12">
+
+            <div class="alert alert-warning text-center">
+
+                <h4>No Products Found</h4>
+
+                <p>
+
+                    Sorry! We couldn't find any products matching
+
+                    <strong>"{{ query }}"</strong>
+
+                </p>
+
+                <a href="{% url 'home' %}"class="btn btn-dark">Back to Home</a>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

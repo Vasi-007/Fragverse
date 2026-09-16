@@ -1,0 +1,755 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="dashboard-header">
+
+        <div>
+            <h1>FragVerse Admin Dashboard</h1>
+            <p>Manage your store overview and performance</p>
+        </div>
+
+        <a href="{% url 'sales_report' %}" class="sales-report-btn">
+            <i class="fas fa-chart-line"></i>
+            Sales Report
+        </a>
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card shadow border-0 text-center p-4 bg-primary text-white">
+                <i class="fa-solid fa-box fa-2x mb-3"></i>
+                <h5>Total Products</h5>
+                <h2>{{ total_products }}</h2>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card shadow border-0 text-center p-4 bg-success text-white">
+                <i class="fa-solid fa-layer-group fa-2x mb-3"></i>
+                <h5>Categories</h5>
+                <h2>{{ total_categories }}</h2>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card shadow border-0 text-center p-4 bg-warning text-dark">
+                <i class="fa-solid fa-users fa-2x mb-3"></i>
+                <h5>Users</h5>
+                <h2>{{ total_users }}</h2>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="card shadow border-0 text-center p-4 bg-danger text-white">
+                <i class="fa-solid fa-cart-shopping fa-2x mb-3"></i>
+                <h5>Orders</h5>
+                <h2>{{ total_orders }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row g-4 mt-2">
+        <div class="col-lg-4">
+            <div class="card shadow border-0 text-center p-4">
+                <i class="fa-solid fa-heart fa-2x text-danger mb-3"></i>
+                <h5>Total Wishlist</h5>
+                <h2>{{ total_wishlist }}</h2>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow border-0 text-center p-4">
+                <i class="fa-solid fa-star fa-2x text-warning mb-3"></i>
+                <h5>Total Reviews</h5>
+                <h2>{{ total_reviews }}</h2>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow border-0 text-center p-4">
+                <i class="fa-solid fa-box-open fa-2x text-primary mb-3"></i>
+                <h5>Low Stock</h5>
+                <h2>{{ low_stock }}</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow border-0 mt-5 text-center p-5">
+
+        <i class="fa-solid fa-indian-rupee-sign fa-3x text-success mb-3"></i>
+        <h4>Total Revenue</h4>
+        <h1 class="text-success fw-bold">
+            ₹{{ total_revenue }}
+        </h1>
+
+    </div>
+
+    <div class="card shadow border-0 mt-4 text-center p-4">
+        <i class="fa-solid fa-triangle-exclamation fa-2x text-danger mb-3"></i>
+        <h4>Out Of Stock Products</h4>
+        <h2 class="text-danger">
+            {{ out_of_stock }}
+        </h2>
+
+    </div>
+
+</div>
+
+<div class="card shadow border-0 mt-5">
+
+    <div class="card-header bg-dark text-white">
+        <h4 class="mb-0">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            Recent Orders
+        </h4>
+    </div>
+
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0 align-middle text-center">
+            <thead class="table-light">
+                <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for order in recent_orders %}
+
+                <tr>
+
+                    <td>#{{ order.id }}</td>
+                    <td>{{ order.user.username }}</td>
+                    <td class="fw-bold text-success">
+                        ₹{{ order.total }}
+                    </td>
+                    <td>
+                        {{ order.created|date:"d M Y" }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="4">No recent orders found.</td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div class="row mt-5">
+
+    <div class="col-lg-6">
+        <div class="card shadow border-0 p-4" style="height:500px;">
+            <h4 class="mb-4">
+                Products by Category
+            </h4>
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card shadow border-0 p-4" style="height: 500px;">
+            <h4 class="mb-4">
+                Store Overview
+            </h4>
+            <canvas id="overviewChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- Monthly Sales -->
+
+<div class="card shadow border-0 mt-5">
+
+    <div class="card-header bg-success text-white py-3">
+
+        <h4 class="mb-0 fw-fold">
+            <i class="fa-solid fa-chart-line"></i>
+            Monthly Sales
+        </h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <div style="height:400px;">
+
+            <canvas id="salesChart"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card shadow border-0 mt-5">
+
+    <div class="card-header bg-warning">
+        <h4 class="mb-0">
+            <i class="fa-solid fa-box-open"></i>
+                Low Stock Products
+        </h4>
+    </div>
+
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0 text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Brand</th>
+                    <th>Price</th>
+                    <th>Stock Left</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for product in low_stock_products %}
+
+                <tr>
+
+                    <td>
+
+                        <img src="{{ product.image.url }}"
+                             width="60"
+                             height="60"
+                             style="object-fit:cover;border-radius:8px;">
+
+                    </td>
+
+                    <td>{{ product.name }}</td>
+
+                    <td>{{ product.brand }}</td>
+
+                    <td class="fw-bold text-success">
+                        ₹{{ product.price }}</td>
+
+                    <td>
+                        {% if product.stock == 0 %}
+                        <span class="badge bg-danger">
+                            Out Of Stock
+                        </span>
+
+                        {% elif product.stock <= 2 %}
+
+                        <span class="badge bg-danger">
+                            {{ product.stock }}
+                        </span>
+
+                        {% else %}
+
+                        <span class="badge bg-warning text-dark">
+                            {{ product.stock }}
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="5">
+                        No low stock products.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+</div>
+
+
+<!-- Best Selling Products -->
+
+<div class="card shadow border-0 mt-5">
+
+    <div class="card-header bg-dark text-white">
+        <h4 class="mb-0">
+         Best Selling Products
+        </h4>
+    </div>
+
+    <div class="card-body">
+
+        {% if best_selling %}
+
+        <table class="table table-hover">
+
+            <thead>
+
+                <tr>
+
+                    <th>Rank</th>
+
+                    <th>Product</th>
+
+                    <th>Total Sold</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for product in best_selling %}
+                <tr>
+                    <td>#{{ forloop.counter }}</td>
+                    <td>{{ product.product__name }}</td>
+                    <td>{{ product.total_sold }}</td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <div class="alert alert-warning mb-0">
+             No sales yet.
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- Top Customers & Latest Reviews -->
+
+<div class="row mt-5">
+
+    <!-- Top Customers -->
+
+    <div class="col-lg-6">
+
+        <div class="card shadow border-0 h-100">
+
+            <div class="card-header bg-primary text-white">
+
+                <h4 class="mb-0">
+                    <i class="fa-solid fa-crown"></i>
+                    Top Customers
+                </h4>
+
+            </div>
+
+            <div class="card-body p-0">
+
+                <table class="table table-hover mb-0 text-center align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>Customer</th>
+                            <th>Orders</th>
+                            <th>Total Spent</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for customer in top_customers %}
+
+                        <tr>
+
+                            <td>{{ customer.user__username }}</td>
+
+                            <td>{{ customer.total_orders }}</td>
+
+                            <td class="fw-bold text-success">
+
+                                ₹{{ customer.total_spent }}
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td colspan="3">No customers yet.</td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Latest Reviews -->
+
+    <div class="col-lg-6">
+
+        <div class="card shadow border-0 h-100">
+
+            <div class="card-header bg-success text-white">
+
+                <h4 class="mb-0">
+
+                    <i class="fa-solid fa-star"></i>
+
+                    Latest Reviews
+
+                </h4>
+
+            </div>
+
+            <div class="card-body p-0">
+
+                <table class="table table-hover mb-0 align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>User</th>
+                            <th>Product</th>
+                            <th>Rating</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for review in latest_reviews %}
+
+                        <tr>
+
+                            <td>{{ review.user.username }}</td>
+
+                            <td>{{ review.product.name }}</td>
+
+                            <td>
+
+                                {% for i in "12345" %}
+
+                                    {% if forloop.counter <= review.rating %}
+
+                                        <i class="fa-solid fa-star text-warning"></i>
+
+                                    {% else %}
+
+                                        <i class="fa-regular fa-star text-secondary"></i>
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td colspan="3">No reviews yet.</td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Chart.js must load before the chart instances below are created. -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const categoryChart = new Chart(
+
+document.getElementById("categoryChart"),
+
+{
+
+    type: "bar",
+
+    data: {
+
+        labels: {{ category_names|safe }},
+
+        datasets: [{
+
+            label: "Products",
+
+            data: {{ category_counts|safe }},
+
+            backgroundColor: [
+
+                "#3498db",
+                "#2ecc71",
+                "#f39c12",
+                "#9b59b6",
+                "#e74c3c",
+                "#1abc9c",
+                "#34495e"
+
+            ]
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+        plugins: {legend: {display: false}}
+
+    }
+
+});
+
+const overviewChart = new Chart(
+
+document.getElementById("overviewChart"),
+
+{
+
+    type: "doughnut",
+
+    data: {
+
+        labels: [
+
+            "Products",
+            "Orders",
+            "Users",
+            "Wishlist"
+
+        ],
+
+        datasets: [{
+
+            data: [
+
+                {{ total_products }},
+                {{ total_orders }},
+                {{ total_users }},
+                {{ total_wishlist }}
+
+            ],
+
+            backgroundColor: [
+
+                "#3498db",
+                "#2ecc71",
+                "#f39c12",
+                "#e74c3c"
+
+            ]
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "60%",
+        radius: "85%",
+
+        plugins: {legend: {position: "top"}},
+
+    }
+
+});
+
+const salesCanvas = document.getElementById("salesChart");
+
+const salesGradient = salesCanvas
+    .getContext("2d")
+    .createLinearGradient(0,0,0,400);
+
+salesGradient.addColorStop(0,"rgba(40,167,69,0.45)");
+salesGradient.addColorStop(1,"rgba(40,167,69,0)");
+
+const salesChart = new Chart(
+
+salesCanvas,
+
+{
+
+    type:"line",
+
+    data:{
+
+        labels: {{ months|safe }},
+
+        datasets:[{
+
+            label:"Monthly Revenue",
+            data: {{ sales|safe }},
+            borderColor:"#28a745",
+            backgroundColor:salesGradient,
+            fill:true,
+            borderWidth:4,
+            pointRadius:6,
+            pointHoverRadius:9,
+            pointBackgroundColor:"#28a745",
+            pointBorderColor:"#ffffff",
+            pointBorderWidth:3,
+            tension:0.45
+
+        }]
+
+    },
+
+    options:{
+
+        responsive:true,
+
+        maintainAspectRatio:false,
+
+        animation:{
+
+            duration:1800,
+
+            easing:"easeOutQuart"
+
+        },
+
+        plugins:{
+
+            legend:{
+
+                display:true,
+
+                position:"top",
+
+                labels:{
+
+                    font:{
+
+                        size:14,
+
+                        weight:"bold"
+
+                    }
+
+                }
+
+            },
+
+            tooltip:{
+
+                backgroundColor:"#212529",
+                titleColor:"#fff",
+                bodyColor:"#fff",
+                padding:14,
+                cornerRadius:8,
+                callbacks:{
+
+                    label:function(context){
+
+                        return " Revenue : \u20B9" + context.parsed.y;
+
+                    }
+
+                }
+
+            }
+
+        },
+
+        scales:{
+
+            y:{
+
+                beginAtZero:true,
+
+                grid:{
+
+                    color:"#ececec"
+
+                },
+
+                ticks:{
+
+                    callback:function(value){
+
+                        return "\u20B9" + value;
+
+                    }
+
+                }
+
+            },
+
+            x:{
+
+                grid:{
+
+                    display:false
+
+                }
+
+            }
+
+        }
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

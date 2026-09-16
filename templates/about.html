@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}About FragVerse{% endblock %}
+
+{% block content %}
+
+<main class="about-page">
+
+    <section class="about-intro">
+
+    <div class="container">
+
+            <div class="about-intro-grid">
+
+                <div class="about-intro-copy">
+
+                    <p class="about-eyebrow">About FragVerse</p>
+
+                    <h1>Fragrance chosen with intention.</h1>
+
+                    <p class="about-lead">
+
+                        FragVerse is a curated destination for distinctive perfumes,
+
+                        thoughtful discovery, and everyday confidence.
+
+                    </p>
+
+                    <a href="{% url 'shop' %}" class="about-primary-link">
+
+                        Explore the collection
+
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+
+                    </a>
+
+                </div>
+
+                <div class="about-intro-image">
+
+                    <img
+
+                        src="{% static 'images/hero.jpg' %}"
+
+                        alt="A curated FragVerse perfume collection"
+
+                    >
+
+                </div>
+
+            </div>
+
+    </div>
+
+    </section>
+
+    <section class="about-story">
+
+    <div class="container">
+
+            <div class="about-story-grid">
+
+                <div>
+
+                    <p class="about-eyebrow">Our story</p>
+
+                    <h2>A better way to find your signature scent.</h2>
+
+                </div>
+
+                <div class="about-story-copy">
+
+                    <p>
+
+                        We created FragVerse for people who see fragrance as part of
+
+                        their identity, not just an accessory. Our collection brings
+
+                        together refined, wearable scents for daily rituals, special
+
+                        occasions, and everything in between.
+
+                    </p>
+
+                    <p>
+
+                        Every product is presented clearly so you can shop with
+
+                        confidence, compare your options, and choose a fragrance
+
+                        that feels right for you.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+    </div>
+
+    </section>
+
+    <section class="about-values">
+
+    <div class="container">
+
+            <div class="about-section-heading">
+
+                <p class="about-eyebrow">The FragVerse standard</p>
+
+                <h2>Simple shopping. Considered fragrances.</h2>
+
+            </div>
+
+            <div class="about-value-grid">
+
+                <article class="about-value-item">
+
+                    <i class="fa-solid fa-certificate" aria-hidden="true"></i>
+
+                    <h3>Authentic selection</h3>
+
+                    <p>Discover carefully selected fragrances from trusted brands.</p>
+
+                </article>
+
+                <article class="about-value-item">
+
+                    <i class="fa-solid fa-truck-fast" aria-hidden="true"></i>
+
+                    <h3>Reliable delivery</h3>
+
+                    <p>From our collection to your door, every order is handled with care.</p>
+
+                </article>
+
+                <article class="about-value-item">
+
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+
+                    <h3>Secure checkout</h3>
+
+                    <p>Shop confidently with a straightforward and secure experience.</p>
+
+                </article>
+
+                <article class="about-value-item">
+
+                    <i class="fa-solid fa-comments" aria-hidden="true"></i>
+
+                    <h3>Helpful support</h3>
+
+                    <p>We are here to help you make a choice you will enjoy wearing.</p>
+
+                </article>
+
+            </div>
+
+    </div>
+
+    </section>
+
+    <section class="about-cta">
+
+    <div class="container">
+
+            <div class="about-cta-inner">
+
+                <div>
+
+                    <p class="about-eyebrow">Find your fragrance</p>
+
+                    <h2>There is a scent for every version of you.</h2>
+
+                </div>
+
+                <a href="{% url 'shop' %}" class="about-primary-link">
+
+                    Shop perfumes
+
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+
+                </a>
+
+            </div>
+
+    </div>
+
+    </section>
+
+</main>
+
+{% endblock %}

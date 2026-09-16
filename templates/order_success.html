@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Order Confirmed | FragVerse{% endblock %}
+
+{% block content %}
+<main class="order-success-page">
+    <section class="order-success-panel" aria-labelledby="order-success-title">
+        <div class="order-success-mark" aria-hidden="true"><i class="fa-solid fa-check"></i></div>
+        <p class="order-success-eyebrow">Payment confirmed</p>
+        <h1 id="order-success-title">Your order is on its way.</h1>
+        <p class="order-success-message">Thank you for shopping with FragVerse. We have received your order and will begin preparing it shortly.</p>
+
+        {% if order %}
+        <div class="order-success-reference">
+            <span>Order reference</span>
+            <strong>#{{ order.order_number }}</strong>
+        </div>
+        {% endif %}
+
+        <div class="order-success-actions">
+            <a href="{% url 'my_orders' %}" class="order-success-primary"><i class="fa-solid fa-box-open"></i> View my orders</a>
+            <a href="{% url 'shop' %}" class="order-success-secondary">Continue shopping <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+    </section>
+</main>
+{% endblock %}

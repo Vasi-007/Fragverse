@@ -1,0 +1,530 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<main class="checkout-page">
+    <div class="container">
+        <div class="checkout-header">
+            <div>
+                <h2>Checkout</h2>
+                <p>Review your delivery details and complete your order.</p>
+            </div>
+            <a href="{% url 'shop' %}" class="back-shopping">
+                <i class="fa-solid fa-arrow-left"></i> Continue shopping
+            </a>
+        </div>
+
+        <div class="row g-4 align-items-start">
+            <section class="col-lg-7">
+                <div class="checkout-card">
+                    <div class="checkout-card-header">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <h4>Delivery address</h4>
+                    </div>
+
+                    <div class="address-details">
+                        <div class="address-row"><span>Name</span><strong>{{ profile.user.username }}</strong></div>
+                        <div class="address-row"><span>Phone</span><strong>{{ profile.phone }}</strong></div>
+                        <div class="address-row"><span>Address</span><strong>{{ profile.address }}</strong></div>
+                        <div class="address-row"><span>City</span><strong>{{ profile.city }}</strong></div>
+                        <div class="address-row"><span>State</span><strong>{{ profile.state }}</strong></div>
+                        <div class="address-row"><span>Country</span><strong>{{ profile.country }}</strong></div>
+                        <div class="address-row"><span>PIN code</span><strong>{{ profile.postal_code }}</strong></div>
+                    </div>
+
+                    <a href="{% url 'edit_profile' %}" class="edit-address">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit delivery address
+                    </a>
+                </div>
+
+                <div class="secure-box">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <div>
+                        <strong>Secure checkout</strong>
+                        <p>Your payment is processed securely through Razorpay.</p>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="col-lg-5">
+
+                <!-- ORDER SUMMARY -->
+                <div class="checkout-card">
+
+                    <div class="checkout-card-header">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                        <h4>Order summary</h4>
+                    </div>
+
+
+                    {% for item in cart %}
+
+                    <div class="checkout-product">
+
+                        <div>
+                            <strong>{{ item.product.name }}</strong>
+
+                            <small>
+                                Quantity: {{ item.quantity }}
+                            </small>
+                        </div>
+
+                        <span>
+                            ₹{{ item.subtotal }}
+                        </span>
+
+                    </div>
+
+                    {% empty %}
+
+                    <p class="text-muted mb-0">
+                        Your cart is empty.
+                    </p>
+
+                    {% endfor %}
+
+
+                    <!-- COUPON -->
+                    <div class="coupon-box">
+
+                        <div class="coupon-box-title">
+
+                            <div>
+                                <i class="fa-solid fa-ticket"></i>
+
+                                <strong>
+                                    Have a coupon?
+                                </strong>
+                            </div>
+
+                            <span>
+                                Save more
+                            </span>
+
+                        </div>
+
+
+                        <form
+                            method="post"
+                            action="{% url 'apply_coupon' %}"
+                            class="coupon-form"
+                        >
+
+                            {% csrf_token %}
+
+                            <input
+                                type="text"
+                                name="coupon_code"
+                                placeholder="Enter coupon code"
+                                value="{{ coupon_code|default:'' }}"
+                                required
+                            >
+
+                            <button type="submit">
+                                Apply
+                            </button>
+
+                        </form>
+
+
+                        {% if coupon_discount %}
+
+                        <div class="coupon-applied">
+
+                            <div>
+
+                                <i class="fa-solid fa-circle-check"></i>
+
+                                <span>
+                                    {{ coupon_code }} applied
+                                </span>
+
+                            </div>
+
+                            <a href="{% url 'remove_coupon' %}">
+                                Remove
+                            </a>
+
+                        </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- AVAILABLE COUPONS -->
+
+                    {% if available_coupons %}
+
+                    <div class="available-coupons">
+
+                        <div class="section-mini-title">
+
+                            <i class="fa-solid fa-tags"></i>
+
+                            <span>
+                                Available coupons
+                            </span>
+
+                        </div>
+
+
+                        {% for coupon in available_coupons %}
+
+                        <div class="coupon-card">
+
+                            <div class="coupon-icon">
+                                <i class="fa-solid fa-percent"></i>
+                            </div>
+
+
+                            <div class="coupon-info">
+
+                                <strong>
+                                    {{ coupon.code }}
+                                </strong>
+
+                                <span>
+                                    {{ coupon.discount_percent }}% OFF
+                                </span>
+
+                                {% if coupon.minimum_amount > 0 %}
+
+                                <small>
+                                    On orders above ₹{{ coupon.minimum_amount }}
+                                </small>
+
+                                {% else %}
+
+                                <small>
+                                    No minimum order required
+                                </small>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <form
+                                method="post"
+                                action="{% url 'apply_coupon' %}"
+                            >
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="coupon_code"
+                                    value="{{ coupon.code }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="coupon-use-btn"
+                                >
+                                    Apply
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% endif %}
+
+
+                    <!-- OFFERS -->
+
+                    <div class="offers-section">
+
+                        <div class="section-mini-title">
+
+                            <i class="fa-solid fa-fire"></i>
+
+                            <span>
+                                Special offers
+                            </span>
+
+                        </div>
+
+
+                        <div class="offer-item">
+
+                            <div class="offer-icon">
+                                <i class="fa-solid fa-truck-fast"></i>
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Free Delivery
+                                </strong>
+
+                                <p>
+                                    Enjoy free shipping on your order.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="offer-item">
+
+                            <div class="offer-icon">
+                                <i class="fa-solid fa-shield-halved"></i>
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Secure Payment
+                                </strong>
+
+                                <p>
+                                    Your payment is protected by Razorpay.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="offer-item">
+
+                            <div class="offer-icon">
+                                <i class="fa-solid fa-gift"></i>
+                            </div>
+
+                            <div>
+
+                                <strong>
+                                    Exclusive Fragrance Offers
+                                </strong>
+
+                                <p>
+                                    Grab the latest deals available on FragVerse.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PRICE DETAILS -->
+
+                    <div class="price-details">
+
+                        <div>
+
+                            <span>
+                                Subtotal
+                            </span>
+
+                            <span>
+                                ₹{{ subtotal }}
+                            </span>
+
+                        </div>
+
+
+                        {% if coupon_discount %}
+
+                        <div class="discount-row">
+
+                            <span>
+                                Coupon ({{ coupon_code }})
+                            </span>
+
+                            <span>
+                                - ₹{{ coupon_discount }}
+                            </span>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        <div>
+
+                            <span>
+                                Shipping
+                            </span>
+
+                            <span class="free">
+                                Free
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- FINAL TOTAL -->
+
+                    <div class="checkout-total">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <strong>
+                            ₹{{ final_total }}
+                        </strong>
+
+                    </div>
+
+
+                    <!-- PAYMENT -->
+
+                    <button
+                        id="rzp-button"
+                        type="button"
+                        class="payment-btn"
+                        {% if not cart %}disabled{% endif %}
+                    >
+
+                        <i class="fa-solid fa-lock"></i>
+
+                        Pay ₹{{ final_total }} securely
+
+                    </button>
+
+
+                    <p class="payment-note">
+
+                        <i class="fa-solid fa-shield-halved"></i>
+
+                        You will be redirected to Razorpay to complete payment.
+
+                    </p>
+
+                </div>
+
+            </aside>
+        </div>
+    </div>
+</main>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+
+console.log(
+    "Razorpay Order ID:",
+    "{{ razorpay_order_id }}"
+);
+
+
+const options = {
+
+    key: "{{ razorpay_key }}",
+
+    amount: {{ amount }},
+
+    currency: "INR",
+
+    name: "FragVerse",
+
+    description: "Perfume Purchase",
+
+    order_id: "{{ razorpay_order_id }}",
+
+    method: {
+        card: true,
+        netbanking: true,
+        wallet: true,
+        upi: true
+    },
+
+
+    handler: function(response) {
+
+        fetch(
+            "{% url 'payment_success' %}",
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json",
+
+                    "X-CSRFToken":
+                        "{{ csrf_token }}"
+
+                },
+
+                body: JSON.stringify({
+
+                    razorpay_payment_id:
+                        response.razorpay_payment_id,
+
+                    razorpay_order_id:
+                        response.razorpay_order_id,
+
+                    razorpay_signature:
+                        response.razorpay_signature
+
+                })
+
+            }
+        )
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            if (data.success) {
+
+                window.location.href =
+                    "{% url 'order_success' %}";
+
+            }
+
+            else {
+
+                alert(data.message);
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            alert(
+                "Something went wrong while confirming your payment."
+            );
+
+        });
+
+    }
+
+};
+
+
+const rzp = new Razorpay(options);
+
+
+document
+    .getElementById("rzp-button")
+    .addEventListener(
+        "click",
+        function() {
+
+            rzp.open();
+
+        }
+    );
+
+</script>
+{% endblock %}

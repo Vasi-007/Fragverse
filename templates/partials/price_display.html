@@ -1,0 +1,7 @@
+{% if offer %}
+    <span class="product-price-original">₹{{ original_price }}</span>
+    <span class="shop-product-price">₹{{ discounted_price }}</span>
+    <span class="product-offer-label">{{ offer.discount_percent|floatformat:0 }}% OFF</span>
+{% else %}
+    <span class="shop-product-price">₹{{ original_price }}</span>
+{% endif %}

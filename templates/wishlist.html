@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Wishlist
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="wishlist-header d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <p class="wishlist-eyebrow">Saved fragrances</p>
+            <h2>My Wishlist</h2>
+        </div>
+
+        <div class="wishlist-header-actions">
+            <form method="post" action="{% url 'clear_wishlist' %}" onsubmit="return confirm('Clear all items from your wishlist?');">
+                {% csrf_token %}
+                <button type="submit" class="clear-wishlist-btn">
+                    <i class="fa-solid fa-trash-can"></i>
+                    Clear Wishlist
+                </button>
+            </form>
+            <a href="{% url 'home' %}" class="btn btn-dark">
+
+                <i class="fa-solid fa-arrow-left me-2"></i>
+
+                Continue Shopping
+
+            </a>
+        </div>
+
+    </div>
+
+    {% if wishlist %}
+
+    <div class="shop-product-grid">
+
+        {% for item in wishlist %}
+
+            <article class="shop-product-card">
+                <div class="shop-product-image-wrap">
+                    <a href="{% url 'product_detail' item.product.name|slugify %}" class="shop-product-image-link">
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                    </a>
+                    {% if item.product.stock > 0 %}
+                        <span class="shop-stock-badge in-stock">In Stock</span>
+                    {% else %}
+                        <span class="shop-stock-badge out-of-stock">Out of Stock</span>
+                    {% endif %}
+                </div>
+
+                <div class="shop-product-body">
+                    <a href="{% url 'product_detail' item.product.name|slugify %}" class="shop-product-name-link">
+                        <h3>{{ item.product.name }}</h3>
+                    </a>
+                    <p class="shop-product-brand">{{ item.product.brand }}</p>
+                    <div class="shop-product-price-row">
+                        {% for variant in item.product.variants.all %}
+                            {% if variant.available and variant.size|lower == "50 ml" or variant.available and variant.size|lower == "50ml" %}
+                                {% include "partials/price_display.html" with original_price=variant.price discounted_price=variant.discounted_price offer=variant.active_offer %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="shop-product-actions">
+                        <a href="{% url 'remove_from_wishlist' item.id %}" class="shop-wishlist-btn" title="Remove from Wishlist" style="background: rgba(220, 53, 69, 0.1); color: #c3363f;">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+
+                        <form method="post" action="{% url 'cart_add' item.product.id %}" class="js-add-to-cart-form shop-cart-form">
+                            {% csrf_token %}
+                            {% include "partials/cart_variant_options.html" with variants=item.product.variants.all %}
+                            <button type="submit" class="shop-add-cart-btn">
+                                <i class="fa-solid fa-cart-shopping"></i>
+                                Add to Cart
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-info">Your wishlist is empty.</div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

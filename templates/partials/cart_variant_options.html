@@ -1,0 +1,15 @@
+<select name="variant_id" class="cart-variant-options" hidden aria-hidden="true">
+    {% for variant in variants %}
+        {% if variant.available and variant.stock > 0 %}
+            <option
+                value="{{ variant.id }}"
+                data-price="{{ variant.discounted_price }}"
+                data-size="{{ variant.size|default:'' }}"
+                data-color="{{ variant.color|default:'' }}"
+                data-other="{{ variant.other|default:'' }}"
+            >
+                {{ variant.size|default:'' }}{% if variant.color %} / {{ variant.color }}{% endif %}{% if variant.other %} / {{ variant.other }}{% endif %}
+            </option>
+        {% endif %}
+    {% endfor %}
+</select>

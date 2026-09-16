@@ -1,0 +1,641 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+
+{{ product.name }}
+
+{% endblock %}
+
+{% block content %}
+
+<section class="py-5">
+
+<div class="container">
+
+<div class="row">
+
+<div class="col-lg-6 text-center">
+
+<div class="product-detail-image-box">
+
+    <img
+        src="{{ product.image.url }}"
+        alt="{{ product.name }}"
+        class="product-detail-main-image"
+    >
+
+</div>
+
+</div>
+
+<div class="col-lg-6">
+
+<h1>{{ product.name }}</h1>
+
+<h5 class="text-secondary"> {{ product.brand }} </h5>
+
+<hr>
+
+<h2 class="text-success" id="product-price">
+
+    {% for variant in product.variants.all %}
+
+        {% if variant.available %}
+
+            {% if variant.size|lower == "50 ml" or variant.size|lower == "50ml" %}
+
+                {% if variant.active_offer %}<span class="product-price-original">₹{{ variant.price }}</span>{% endif %}
+                <span>{{ variant.discounted_price }}</span>
+                {% if variant.active_offer %}<span class="product-offer-label">{{ variant.active_offer.discount_percent|floatformat:0 }}% OFF</span>{% endif %}
+
+            {% endif %}
+
+        {% endif %}
+
+    {% endfor %}
+
+</h2>
+
+{% with variants=product.variants.all %}
+    
+    {% if variants %}
+
+        <div class="product-variants-section mt-4">
+
+            
+
+            <div class="variant-list">
+
+                {% for variant in variants %}
+
+                    {% if variant.available and variant.stock > 0 %}
+
+                        <button
+                            type="button"
+                            class="variant-option"
+                            data-variant-id="{{ variant.id }}"
+                            data-price="{{ variant.discounted_price }}"
+                            data-stock="{{ variant.stock }}"
+                        >
+
+                            {% if variant.size %}
+
+                                <span>
+                                    {{ variant.size }}
+                                </span>
+
+                            {% endif %}
+
+                            {% if variant.color %}
+
+                                <span>
+                                    {{ variant.color }}
+                                </span>
+
+                            {% endif %}
+
+                            {% if variant.other %}
+
+                                <span>
+                                    {{ variant.other }}
+                                </span>
+
+                            {% endif %}
+
+                            <strong>
+                                {% if variant.active_offer %}<span class="product-price-original">₹{{ variant.price }}</span>{% endif %}
+                                ₹{{ variant.discounted_price }}
+                                {% if variant.active_offer %}<span class="product-offer-label">{{ variant.active_offer.discount_percent|floatformat:0 }}% OFF</span>{% endif %}
+                            </strong>
+
+                        </button>
+
+                    {% endif %}
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+{% endwith %}
+
+<div class="my-3">
+
+    <div style="font-size:28px;color:#ffc107;">
+
+        {% if average_rating >= 1 %}★{% else %}☆{% endif %}
+        {% if average_rating >= 2 %}★{% else %}☆{% endif %}
+        {% if average_rating >= 3 %}★{% else %}☆{% endif %}
+        {% if average_rating >= 4 %}★{% else %}☆{% endif %}
+        {% if average_rating >= 5 %}★{% else %}☆{% endif %}
+
+    </div>
+
+    <h6 class="mt-2">
+
+        {{ average_rating|default:"0"|floatformat:1 }}/5
+
+        ({{ review_count }} Review{{ review_count|pluralize }})
+
+    </h6>
+
+</div>
+
+
+
+<p> {{ product.description }} </p>
+
+<p class="product-stock-display">
+    <strong>Stock:</strong>
+
+    <span id="variant-stock">
+        Select a variant
+    </span>
+</p>
+
+{% if product.available %}
+
+<span class="badge bg-success">Available </span>
+
+{% else %}
+
+<span class="badge bg-danger">Out of Stock </span>
+
+{% endif %}
+
+<br><br>
+
+<form
+    action="{% url 'cart_add' product.id %}"
+    method="post"
+    class="js-add-to-cart-form product-detail-cart-form"
+    id="product-cart-form"
+>
+
+    {% csrf_token %}
+
+    <input
+        type="hidden"
+        name="variant_id"
+        id="selected-variant-id"
+        value=""
+    >
+
+    <button
+        type="submit"
+        class="product-detail-cart-btn"
+    >
+        <i class="fa-solid fa-cart-shopping"></i>
+        Add to Cart
+    </button>
+
+</form>
+
+<a href="{% url 'home' %}" class="btn btn-outline-secondary btn-lg"> Back </a>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- Reviews Section  -->
+
+<div class="container mt-5">
+
+    <hr>
+
+    <h3 class="mb-4">
+        Customer Reviews
+    </h3>
+
+    {% if user.is_authenticated %}
+
+    <div class="card mb-4">
+
+        <div class="card-body">
+
+            <h5>Write a Review</h5>
+
+            
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Rating
+                    </label>
+
+                    {{ form.rating }}
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+                        Comment
+                    </label>
+
+                    {{ form.comment }}
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn btn-dark">
+
+                    Submit Review
+
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="alert alert-warning">Please login to write a review.</div>
+
+    {% endif %}
+
+    {% if reviews %}
+
+        {% for review in reviews %}
+
+        <div class="card mb-3">
+
+            <div class="card-body">
+
+                <h5>
+
+                    {% for i in "12345" %}
+
+                        {% if forloop.counter <= review.rating %}
+
+                            ⭐
+
+                        {% else %}
+
+                            ☆
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </h5>
+
+                <p>
+
+                    {{ review.comment }}
+
+                </p>
+
+                <small class="text-muted">
+
+                    By {{ review.user.username }}
+
+                    |
+
+                    {{ review.created_at }}
+
+                </small>
+
+                
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <div class="alert alert-info">
+
+            No reviews yet.
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+<hr class="my-5">
+
+<div class="container">
+
+    <h3 class="mb-4 text-center">
+        Related Products
+    </h3>
+
+    <div class="shop-product-grid related-products-grid">
+
+        {% for item in related_products %}
+
+            <article class="shop-product-card">
+
+                <div class="shop-product-image-wrap">
+
+                    <a
+                        href="{% url 'product_detail' item.name|slugify %}"
+                        class="shop-product-image-link"
+                    >
+
+                        <img
+                            src="{{ item.image.url }}"
+                            alt="{{ item.name }}"
+                        >
+
+                    </a>
+
+                    {% if item.stock > 0 %}
+
+                        <span class="shop-stock-badge in-stock">
+                            In Stock
+                        </span>
+
+                    {% else %}
+
+                        <span class="shop-stock-badge out-of-stock">
+                            Out of Stock
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="shop-product-body">
+
+                    <a
+                        href="{% url 'product_detail' item.name|slugify %}"
+                        class="shop-product-name-link"
+                    >
+
+                        <h3>
+                            {{ item.name }}
+                        </h3>
+
+                    </a>
+
+
+                    <p class="shop-product-brand">
+                        {{ item.brand }}
+                    </p>
+
+
+                    <div class="shop-product-price-row">
+
+                        <span class="shop-product-price">
+                            ₹{{ item.price }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="shop-product-actions">
+
+                        <a href="{% url 'add_to_wishlist' item.id %}"
+                        class="shop-wishlist-btn js-wishlist-btn {% if item.id in wishlist_product_ids %}is-active{% endif %}"
+                        title="Add to Wishlist">
+
+                            {% if item.id in wishlist_product_ids %}
+                                <i class="fa-solid fa-heart"></i>
+                            {% else %}
+                                <i class="fa-regular fa-heart"></i>
+                            {% endif %}
+
+                        </a>
+
+  
+                        <form
+                            method="post"
+                            action="{% url 'cart_add' item.id %}"
+                            class="js-add-to-cart-form shop-cart-form"
+                        >
+
+                            {% csrf_token %}
+                            {% include "partials/cart_variant_options.html" with variants=item.variants.all %}
+
+                            <button
+                                type="submit"
+                                class="shop-add-cart-btn"
+                            >
+
+                                <i class="fa-solid fa-cart-shopping"></i>
+
+                                Add to Cart
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        {% empty %}
+
+            <div class="shop-empty-state">
+
+                <h3>
+                    No Related Products Found.
+                </h3>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+
+    const variantButtons =
+        document.querySelectorAll(".variant-option");
+
+
+    const priceElement =
+        document.getElementById("product-price");
+
+
+    const stockElement =
+        document.getElementById("variant-stock");
+
+
+    const selectedVariantInput =
+        document.getElementById("selected-variant-id");
+
+
+    function selectVariant(button) {
+
+
+        /* ----------------------------- */
+        /* REMOVE ACTIVE STATE */
+        /* ----------------------------- */
+
+        variantButtons.forEach(function (item) {
+
+            item.classList.remove("active");
+
+        });
+
+
+        /* ----------------------------- */
+        /* ADD ACTIVE STATE */
+        /* ----------------------------- */
+
+        button.classList.add("active");
+
+
+        /* ----------------------------- */
+        /* GET VARIANT DATA */
+        /* ----------------------------- */
+
+        const variantId =
+            button.dataset.variantId;
+
+
+        const price =
+            button.dataset.price;
+
+
+        const stock =
+            parseInt(
+                button.dataset.stock
+            );
+
+
+        /* ----------------------------- */
+        /* UPDATE PRICE */
+        /* ----------------------------- */
+
+        priceElement.textContent =
+            "₹" + price;
+
+
+        /* ----------------------------- */
+        /* UPDATE STOCK */
+        /* ----------------------------- */
+
+        if (stock > 0) {
+
+            stockElement.textContent =
+                stock + " available";
+
+            stockElement.style.color =
+                "green";
+
+        }
+
+        else {
+
+            stockElement.textContent =
+                "Out of Stock";
+
+            stockElement.style.color =
+                "red";
+
+        }
+
+
+        /* ----------------------------- */
+        /* STORE SELECTED VARIANT */
+        /* ----------------------------- */
+
+        selectedVariantInput.value =
+            variantId;
+
+    }
+
+
+    /* ============================= */
+    /* VARIANT CLICK */
+    /* ============================= */
+
+    variantButtons.forEach(function (button) {
+
+        button.addEventListener(
+            "click",
+            function () {
+
+                selectVariant(this);
+
+            }
+        );
+
+    });
+
+
+    /* ============================= */
+    /* DEFAULT = 50 ML */
+    /* ============================= */
+
+    let defaultVariant = null;
+
+
+    variantButtons.forEach(function (button) {
+
+
+        const text =
+            button.textContent
+                .trim()
+                .toLowerCase();
+
+
+        if (
+            text.includes("50 ml") ||
+            text.includes("50ml")
+        ) {
+
+            defaultVariant = button;
+
+        }
+
+    });
+
+
+    /* ============================= */
+    /* SELECT DEFAULT VARIANT */
+    /* ============================= */
+
+    if (defaultVariant) {
+
+        selectVariant(
+            defaultVariant
+        );
+
+    }
+
+    else if (variantButtons.length > 0) {
+
+        selectVariant(
+            variantButtons[0]
+        );
+
+    }
+
+});
+
+</script>
+
+{% endblock %}

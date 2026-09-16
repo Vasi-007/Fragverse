@@ -1,0 +1,681 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+Shop | FragVerse
+{% endblock %}
+
+{% block content %}
+
+<section class="shop-page">
+
+```
+<div class="container shop-shell">
+
+    <!-- ============================= -->
+    <!-- SHOP HEADER -->
+    <!-- ============================= -->
+
+    <div class="shop-header-row">
+
+        <div>
+
+            <p class="shop-kicker">
+                Curated Fragrance Collection
+            </p>
+
+            <h1 class="shop-title">
+                Shop Perfumes
+            </h1>
+
+            <p class="shop-subtitle">
+                Discover your signature fragrance from our collection.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- SHOP CONTENT -->
+    <!-- ============================= -->
+
+    <div class="shop-layout">
+
+
+        <!-- ============================= -->
+        <!-- FILTER SIDEBAR -->
+        <!-- ============================= -->
+
+        <aside class="shop-filter-sidebar">
+
+            <div class="filter-header">
+
+                <h3>
+                    Filters
+                </h3>
+
+            </div>
+
+
+            <form method="get" class="shop-filter-form">
+
+
+                <!-- SEARCH -->
+
+                <div class="filter-group">
+
+                    <label for="shop-search">
+                        Search
+                    </label>
+
+                    <input
+                        type="text"
+                        id="shop-search"
+                        name="q"
+                        value="{{ search_query }}"
+                        placeholder="Search perfumes..."
+                    >
+
+                </div>
+
+
+                <!-- CATEGORY -->
+
+                <div class="filter-group">
+
+                    <label>
+                        Category
+                    </label>
+
+
+                    <div class="category-filter-list">
+
+
+                        <label class="category-option">
+
+                            <input
+                                type="radio"
+                                name="category"
+                                value=""
+                                {% if not request.GET.category %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <span>
+                                All Categories
+                            </span>
+
+                        </label>
+
+
+                        {% for category in categories %}
+
+                        <label class="category-option">
+
+                            <input
+                                type="radio"
+                                name="category"
+                                value="{{ category.id }}"
+                                {% if request.GET.category == category.id|stringformat:"s" %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <span>
+                                {{ category.name }}
+                            </span>
+
+                        </label>
+
+                        {% endfor %}
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- PRICE RANGE -->
+
+                <div class="filter-group">
+
+                    <label for="shop-price-filter">
+                        Price range
+                    </label>
+
+                    <select id="shop-price-filter" name="price" class="shop-filter-select">
+                        <option value="" {% if not selected_price %}selected{% endif %}>All prices</option>
+                        <option value="under_1000" {% if selected_price == "under_1000" %}selected{% endif %}>Under ₹1,000</option>
+                        <option value="1000_2500" {% if selected_price == "1000_2500" %}selected{% endif %}>₹1,000 - ₹2,500</option>
+                        <option value="2500_5000" {% if selected_price == "2500_5000" %}selected{% endif %}>₹2,501 - ₹5,000</option>
+                        <option value="above_5000" {% if selected_price == "above_5000" %}selected{% endif %}>Above ₹5,000</option>
+                    </select>
+
+                </div>
+
+
+                <!-- SORT BY PRICE -->
+
+                <div class="filter-group">
+
+                    <label for="shop-sort">
+                        Sort products
+                    </label>
+
+                    <select id="shop-sort" name="sort" class="shop-filter-select">
+                        <option value="newest" {% if selected_sort == "newest" %}selected{% endif %}>Newest first</option>
+                        <option value="price_low" {% if selected_sort == "price_low" %}selected{% endif %}>Price: Low to high</option>
+                        <option value="price_high" {% if selected_sort == "price_high" %}selected{% endif %}>Price: High to low</option>
+                        <option value="name_asc" {% if selected_sort == "name_asc" %}selected{% endif %}>Name: A to Z</option>
+                        <option value="name_desc" {% if selected_sort == "name_desc" %}selected{% endif %}>Name: Z to A</option>
+                    </select>
+
+                </div>
+
+
+                <!-- APPLY BUTTON -->
+
+                <button
+                    type="submit"
+                    class="shop-filter-btn"
+                >
+
+                    Apply Filters
+
+                </button>
+
+
+                <!-- CLEAR -->
+
+                <a
+                    href="{% url 'shop' %}"
+                    class="shop-clear-filter"
+                >
+
+                    Clear Filters
+
+                </a>
+
+
+            </form>
+
+        </aside>
+
+
+
+        <!-- ============================= -->
+        <!-- PRODUCTS -->
+        <!-- ============================= -->
+
+        <div class="shop-products-area">
+
+
+            <!-- RESULTS HEADER -->
+
+            <div class="shop-results-header">
+
+                <p>
+
+                    {% if products %}
+
+                        Showing {{ products|length }}
+                        product{{ products|length|pluralize }}
+
+                    {% else %}
+
+                        No products found
+
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+
+            <!-- ============================= -->
+            <!-- PRODUCT GRID -->
+            <!-- ============================= -->
+
+            <div class="shop-product-grid">
+
+
+                {% for item in products %}
+
+
+                <!-- ============================= -->
+                <!-- PRODUCT CARD -->
+                <!-- ============================= -->
+
+                <div class="shop-product-card">
+
+
+                    <!-- ============================= -->
+                    <!-- PRODUCT IMAGE -->
+                    <!-- ============================= -->
+
+                    <div class="shop-product-image-wrapper">
+
+
+                        <a
+                            href="{% url 'product_detail' item.id %}"
+                            class="shop-product-image-link"
+                        >
+
+                            {% if item.image %}
+
+                            <img
+                                src="{{ item.image.url }}"
+                                alt="{{ item.name }}"
+                                class="shop-product-image"
+                            >
+
+                            {% else %}
+
+                            <img
+                                src="{% static 'images/product-placeholder.png' %}"
+                                alt="{{ item.name }}"
+                                class="shop-product-image"
+                            >
+
+                            {% endif %}
+
+                        </a>
+
+
+
+                        <!-- STOCK BADGE -->
+
+                        {% with variants=item.variants.all %}
+
+                            {% if variants %}
+
+                                {% for variant in variants %}
+
+                                    {% if variant.available and variant.stock > 0 %}
+
+                                        {% if variant.size|lower == "50 ml" or variant.size|lower == "50ml" %}
+
+                                            <span class="shop-stock-badge">
+
+                                                <strong>
+                                                    In Stock
+                                                </strong>
+
+                                            </span>
+
+                                        {% endif %}
+
+                                    {% endif %}
+
+                                {% endfor %}
+
+                            {% endif %}
+
+                        {% endwith %}
+
+
+
+                        <!-- WISHLIST -->
+
+                        {% if user.is_authenticated %}
+
+                        <form
+                            method="post"
+                            action="{% url 'wishlist_toggle' item.id %}"
+                            class="wishlist-form js-wishlist-form"
+                            data-product-name="{{ item.name }}"
+                        >
+
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="shop-wishlist-btn"
+                                aria-label="Add to wishlist"
+                            >
+
+                                {% if item.id in wishlist_product_ids %}
+
+                                    <i class="fa-solid fa-heart"></i>
+
+                                {% else %}
+
+                                    <i class="fa-regular fa-heart"></i>
+
+                                {% endif %}
+
+                            </button>
+
+                        </form>
+
+                        {% else %}
+
+                        <a
+                            href="{% url 'login' %}"
+                            class="shop-wishlist-btn"
+                            aria-label="Login to add wishlist"
+                        >
+
+                            <i class="fa-regular fa-heart"></i>
+
+                        </a>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+
+                    <!-- ============================= -->
+                    <!-- PRODUCT INFORMATION -->
+                    <!-- ============================= -->
+
+                    <div class="shop-product-info">
+
+
+                        <!-- PRODUCT NAME -->
+
+                        <a
+                            href="{% url 'product_detail' item.id %}"
+                            class="shop-product-name"
+                        >
+
+                            {{ item.name }}
+
+                        </a>
+
+
+
+                        <!-- BRAND -->
+
+                        <p class="shop-product-brand">
+
+                            {{ item.brand }}
+
+                        </p>
+
+
+
+                        <!-- RATING -->
+
+                        <div class="shop-product-rating">
+
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-regular fa-star"></i>
+
+                        </div>
+
+
+
+                        <!-- ============================= -->
+                        <!-- PRICE -->
+                        <!-- ============================= -->
+
+                        <div class="shop-product-price-row">
+
+                            {% for variant in item.variants.all %}
+
+                                {% if variant.available %}
+
+                                    {% if variant.size|lower == "50 ml" or variant.size|lower == "50ml" %}
+
+                                        {% include "partials/price_display.html" with original_price=variant.price discounted_price=variant.discounted_price offer=variant.active_offer %}
+
+                                    {% endif %}
+
+                                {% endif %}
+
+                            {% endfor %}
+
+                        </div>
+
+
+
+                        <!-- ============================= -->
+                        <!-- ADD TO CART -->
+                        <!-- ============================= -->
+
+                        {% if user.is_authenticated %}
+                            <form
+                                method="post"
+                                action="{% url 'cart_add' item.id %}"
+                                class="js-add-to-cart-form shop-cart-form"
+                            >
+
+                                {% csrf_token %}
+                                {% include "partials/cart_variant_options.html" with variants=item.variants.all %}
+
+                                <button
+                                    type="submit"
+                                    class="shop-add-cart-btn"
+                                >
+
+                                    <i class="fa-solid fa-cart-shopping"></i>
+
+                                    Add to Cart
+
+                                </button>
+
+                            </form>
+
+                        {% else %}
+
+                            <a
+                                href="{% url 'login' %}?next={{ request.path|urlencode }}"
+                                class="shop-add-cart-btn"
+                            >
+
+                                <i class="fa-solid fa-cart-shopping"></i>
+
+                                Add to Cart
+
+                            </a>
+
+                        {% endif %}
+
+
+                    </div>
+
+                </div>
+
+
+                {% empty %}
+
+
+                <!-- ============================= -->
+                <!-- NO PRODUCTS -->
+                <!-- ============================= -->
+
+                <div class="shop-empty-state">
+
+                    <div class="shop-empty-icon">
+
+                        <i class="fa-solid fa-box-open"></i>
+
+                    </div>
+
+
+                    <h3>
+                        No perfumes found
+                    </h3>
+
+
+                    <p>
+                        Try changing your search or filter.
+                    </p>
+
+
+                    <a
+                        href="{% url 'shop' %}"
+                        class="shop-filter-btn"
+                    >
+
+                        View All Products
+
+                    </a>
+
+                </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+```
+
+</section>
+
+<!-- ================================= -->
+
+<!-- ADD TO CART / WISHLIST JAVASCRIPT -->
+
+<!-- ================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+
+    /* ============================= */
+    /* WISHLIST */
+    /* ============================= */
+
+    document.querySelectorAll(".js-wishlist-form").forEach(function (form) {
+
+        form.addEventListener("submit", function (event) {
+
+            event.preventDefault();
+
+
+            const button =
+                form.querySelector(".shop-wishlist-btn");
+
+
+            const formData =
+                new FormData(form);
+
+
+            fetch(form.action, {
+
+                method: "POST",
+
+                body: formData,
+
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+
+            })
+
+            .then(response => response.json())
+
+            .then(data => {
+
+                if (data.success) {
+
+                    const icon =
+                        button.querySelector("i");
+
+
+                    if (data.added) {
+
+                        icon.classList.remove(
+                            "fa-regular"
+                        );
+
+                        icon.classList.add(
+                            "fa-solid"
+                        );
+
+                    } else {
+
+                        icon.classList.remove(
+                            "fa-solid"
+                        );
+
+                        icon.classList.add(
+                            "fa-regular"
+                        );
+
+                    }
+
+                    if (data.message) {
+                        showShopMessage(data.message);
+                    }
+
+
+                } else {
+
+                    showShopMessage(
+                        data.message ||
+                        "Unable to update wishlist."
+                    );
+
+                }
+
+            })
+
+            .catch(error => {
+
+                console.error(
+                    "Wishlist error:",
+                    error
+                );
+
+            });
+
+        });
+
+    });
+
+
+
+    /* ============================= */
+    /* MESSAGE */
+    /* ============================= */
+
+    function showShopMessage(message) {
+
+        let messageBox = document.querySelector(".shop-message");
+
+        if (!messageBox) {
+            messageBox = document.createElement("div");
+            messageBox.className = "shop-message";
+            document.body.appendChild(messageBox);
+        }
+
+        messageBox.textContent = message;
+        messageBox.classList.remove("show");
+        void messageBox.offsetWidth;
+        messageBox.classList.add("show");
+
+        setTimeout(function () {
+            messageBox.classList.remove("show");
+        }, 2500);
+
+    }
+
+
+});
+
+</script>
+
+{% endblock %}

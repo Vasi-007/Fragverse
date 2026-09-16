@@ -1,0 +1,173 @@
+
+
+{% extends "base.html" %}
+
+{% block title %}
+Brands | FragVerse
+{% endblock %}
+
+{% block content %}
+
+<section class="shop-page">
+
+    <div class="container shop-shell">
+
+        <!-- PAGE HEADER -->
+        <div class="shop-header-row">
+
+            <div>
+                <p class="shop-kicker">
+                    Discover Your Signature Scent
+                </p>
+
+                <h1 class="shop-title">
+                    Our Brands
+                </h1>
+            </div>
+
+            <a href="{% url 'home' %}" class="shop-home-link">
+                <i class="fa-solid fa-house"></i>
+                Back to Home
+            </a>
+
+        </div>
+
+
+        <!-- PRODUCTS -->
+        <div class="shop-main-panel">
+
+            {% if perfumes %}
+
+                <div class="shop-product-grid">
+
+                    {% for perfume in perfumes %}
+
+                        <article class="shop-product-card">
+
+                            <!-- PRODUCT IMAGE -->
+                            <div class="shop-product-image-wrap">
+
+                                <a href="{% url 'product_detail' perfume.name|slugify %}"
+                                class="shop-product-image-link">
+
+                                    <img src="{{ perfume.image.url }}"
+                                        alt="{{ perfume.name }}">
+
+                                </a>
+
+                                {% if perfume.stock > 0 %}
+                                    <span class="shop-stock-badge in-stock">
+                                    
+                                        In Stock
+                                    </span>
+                                {% else %}
+                                    <span class="shop-stock-badge out-of-stock">
+                                        Out of Stock
+                                    </span>
+                                {% endif %}
+
+                            </div>
+
+                            <!-- PRODUCT DETAILS -->
+                            <div class="shop-product-body">
+
+                                <h3 class="shop-product-name">
+                                    {{ perfume.name }}
+                                </h3>
+
+                                <p class="shop-product-brand">
+                                    {{ perfume.brand }}
+                                </p>
+
+
+                                <!-- PRICE -->
+                                <div class="shop-product-price-row">
+
+                                    {% for variant in perfume.variants.all %}
+                                        {% if variant.available and variant.size|lower == "50 ml" or variant.available and variant.size|lower == "50ml" %}
+                                            {% include "partials/price_display.html" with original_price=variant.price discounted_price=variant.discounted_price offer=variant.active_offer %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                </div>
+
+
+                                <!-- WISHLIST + CART -->
+                                <div class="shop-product-actions">
+
+                                    <!-- WISHLIST -->
+                                    <a href="{% url 'add_to_wishlist' perfume.id %}"
+                                    class="shop-wishlist-btn js-wishlist-btn {% if perfume.id in wishlist_product_ids %}is-active{% endif %}"
+                                    title="Add to Wishlist">
+
+                                        {% if perfume.id in wishlist_product_ids %}
+                                            <i class="fa-solid fa-heart"></i>
+                                        {% else %}
+                                            <i class="fa-regular fa-heart"></i>
+                                        {% endif %}
+
+                                    </a>  
+
+
+                                    <!-- ADD TO CART -->
+                                    <form method="post"
+                                          action="{% url 'cart_add' perfume.id %}"
+                                          class="js-add-to-cart-form shop-cart-form">
+
+                                        {% csrf_token %}
+                                        {% include "partials/cart_variant_options.html" with variants=perfume.variants.all %}
+
+                                        <button type="submit"
+                                                class="shop-add-cart-btn">
+
+                                            <i class="fa-solid fa-cart-shopping"></i>
+                                            Add to Cart
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+                    {% endfor %}
+
+                </div>
+
+
+            {% else %}
+
+                <!-- EMPTY STATE -->
+                <div class="shop-empty-state">
+
+                    <div class="shop-empty-icon">
+                        <i class="fa-solid fa-spray-can-sparkles"></i>
+                    </div>
+
+                    <h3>
+                        No Perfumes Available
+                    </h3>
+
+                    <p>
+                        There are currently no perfumes available in our collection.
+                    </p>
+
+                    <a href="{% url 'home' %}"
+                       class="btn btn-filter-submit">
+                        Back to Home
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

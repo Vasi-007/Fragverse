@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}
+Login - FragVerse
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-page-wrapper">
+    <div class="container auth-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-8 col-sm-10">
+                
+                <!-- Auth Card -->
+                <div class="auth-card premium-card">
+                    
+                    <!-- Header -->
+                    <div class="auth-header text-center">
+                        <h1 class="auth-title">Welcome Back</h1>
+                        <p class="auth-subtitle">Login to your FragVerse account</p>
+                    </div>
+
+                    <!-- Error Messages -->
+                    {% if error %}
+                        <div class="alert alert-danger alert-dismissible fade show auth-alert" role="alert">
+                            <i class="fas fa-exclamation-circle"></i> {{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show auth-alert" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <i class="fas fa-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+
+                    <!-- Login Form -->
+                    <form method="POST" class="auth-form">
+                        {% csrf_token %}
+
+                        <!-- Email or Username -->
+                        <div class="form-group auth-form-group">
+                            <label for="{{ form.username.id_for_label }}" class="auth-label">
+                                <i class="fas fa-user"></i> Email or Username
+                            </label>
+                            <input 
+                                type="text"
+                                name="username"
+                                class="form-control auth-input {% if form.username.errors %}is-invalid{% endif %}"
+                                placeholder="Enter your email or username"
+                                value="{{ form.username.value|default:'' }}"
+                                required
+                                autocomplete="username"
+                            >
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback auth-error-message">
+                                    {% for error in form.username.errors %}
+                                        <i class="fas fa-times-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-group auth-form-group">
+                            <label for="{{ form.password.id_for_label }}" class="auth-label">
+                                <i class="fas fa-lock"></i> Password
+                            </label>
+                            <div class="auth-password-wrapper">
+                                <input 
+                                    type="password"
+                                    name="password"
+                                    id="id_password"
+                                    class="form-control auth-input {% if form.password.errors %}is-invalid{% endif %}"
+                                    placeholder="Password"
+                                    required
+                                    autocomplete="current-password"
+                                >
+                                <button 
+                                    type="button"
+                                    class="auth-password-toggle"
+                                    id="togglePassword"
+                                    aria-label="Show password"
+                                >
+                                    <i class="fas fa-eye" id="eye"></i>
+                                </button>
+                            </div>
+                            {% if form.password.errors %}
+                                <div class="invalid-feedback auth-error-message">
+                                    {% for error in form.password.errors %}
+                                        <i class="fas fa-times-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn auth-submit-btn w-100">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="auth-divider">
+                        <span>Don't have an account?</span>
+                    </div>
+
+                    <!-- Register Link -->
+                    <a href="{% url 'register' %}" class="auth-switch-link">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Password Toggle Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordInput = document.getElementById('id_password');
+        const passwordToggle = document.getElementById('togglePassword');
+        const passwordEye = document.getElementById('eye');
+
+        if (passwordToggle) {
+            passwordToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                const isPassword = passwordInput.type === 'password';
+                passwordInput.type = isPassword ? 'text' : 'password';
+                passwordEye.classList.toggle('fa-eye', !isPassword);
+                passwordEye.classList.toggle('fa-eye-slash', isPassword);
+                passwordToggle.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+            });
+        }
+    });
+</script>
+
+{% endblock %}
+

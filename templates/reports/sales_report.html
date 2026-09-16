@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}
+Sales Report
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <h2 class="fw-bold mb-4">📈 Sales Report</h2>
+
+    <div class="mb-4">
+
+        <a href="{% url 'export_sales_pdf' %}"
+           class="btn btn-danger">
+            <i class="fa-solid fa-file-pdf"></i>
+            Download PDF
+        </a>
+
+    </div>
+
+    <div class="row g-4 mb-5">
+
+<div class="card shadow border-0 mb-5">
+
+    <div class="card-body">
+
+        <form method="GET">
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <label class="form-label">Start Date</label>
+
+                    <input
+                        type="date"
+                        name="start_date"
+                        class="form-control"
+                        value="{{ start_date }}">
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <label class="form-label">End Date</label>
+
+                    <input
+                        type="date"
+                        name="end_date"
+                        class="form-control"
+                        value="{{ end_date }}">
+
+                </div>
+
+                <div class="col-md-4 d-flex align-items-end">
+
+                    <button class="btn btn-primary me-2">Filter</button>
+
+                    <a href="{% url 'sales_report' %}"
+                    class="btn btn-secondary">
+                       Reset
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- FILTER FORM -->
+
+
+<div class="card shadow border-0 mb-5">
+
+    <div class="card-header bg-secondary text-white">
+
+        <h4 class="mb-0">Filter Sales Report</h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <form method="GET">
+
+            <div class="row">
+
+                <div class="col-md-5">
+
+                    <label class="form-label">Start Date</label>
+
+                    <input
+                        type="date"
+                        name="start_date"
+                        class="form-control"
+                        value="{{ start_date }}"
+                    >
+
+                </div>
+
+                <div class="col-md-5">
+
+                    <label class="form-label">End Date</label>
+
+                    <input
+                        type="date"
+                        name="end_date"
+                        class="form-control"
+                        value="{{ end_date }}"
+                    >
+
+                </div>
+
+                <div class="col-md-2 d-flex align-items-end">
+
+                    <button class="btn btn-primary w-100">Filter</button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+    <div class="row g-4 mb-5">
+
+    <div class="col-md-4">
+
+        <div class="card shadow border-0 text-center p-4">
+
+            <i class="fa-solid fa-cart-shopping fa-2x text-primary mb-3"></i>
+
+            <h5>Total Orders</h5>
+
+            <h2>{{ total_orders }}</h2>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card shadow border-0 text-center p-4">
+
+            <i class="fa-solid fa-indian-rupee-sign fa-2x text-success mb-3"></i>
+
+            <h5>Total Revenue</h5>
+
+            <h2>₹{{ total_revenue }}</h2>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="card shadow border-0 text-center p-4">
+
+            <i class="fa-solid fa-box fa-2x text-warning mb-3"></i>
+
+            <h5>Total Products Sold</h5>
+
+            <h2>{{ total_products_sold }}</h2>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="card shadow border-0 mb-5">
+
+    <div class="card-header bg-dark text-white">
+
+        <h4 class="mb-0">Monthly Sales</h4>
+
+    </div>
+
+    <div class="card-body">
+
+        <canvas id="salesChart" height="120"></canvas>
+
+    </div>
+
+</div>
+
+<div class="card shadow border-0">
+
+    <div class="card-header bg-primary text-white">
+
+        <h4 class="mb-0">All Orders</h4>
+
+    </div>
+
+    <div class="card-body p-0">
+
+        <table class="table table-hover table-striped mb-0 text-center">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Total</th>
+                    <th>Date</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for order in orders %}
+
+                <tr>
+
+                    <td>#{{ order.id }}</td>
+
+                    <td>{{ order.user.username }}</td>
+
+                    <td class="fw-bold text-success">₹{{ order.total }}</td>
+
+                    <td>{{ order.created|date:"d M Y" }}</td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="4">No Orders Found.</td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+new Chart(
+
+document.getElementById("salesChart"),
+
+{
+
+    type: "line",
+
+    data: {
+
+        labels: {{ months|safe }},
+
+        datasets: [{
+
+            label: "Monthly Sales",
+
+            data: {{ sales|safe }},
+
+            borderColor: "#198754",
+
+            backgroundColor: "rgba(25,135,84,0.2)",
+
+            fill: true,
+
+            tension: 0.4
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false
+
+    }
+
+});
+
+</script>
+
+</div>
+
+{% endblock %}

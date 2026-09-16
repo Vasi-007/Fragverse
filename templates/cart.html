@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}
+Shopping Cart | FragVerse
+{% endblock %}
+
+{% block content %}
+
+<section class="cart-page">
+    <div class="container cart-shell">
+        <div class="cart-header-row">
+            <div>
+                <p class="cart-kicker">Your Bag</p>
+                <h1>Shopping Cart</h1>
+            </div>
+            <a href="{% url 'shop' %}" class="btn btn-continue-shopping">
+                <i class="fa-solid fa-arrow-left"></i> Continue Shopping
+            </a>
+        </div>
+
+        {% if cart %}
+            <div class="cart-layout">
+                <div class="cart-items-panel">
+                    {% for item in cart %}
+                        <div class="cart-item-row" data-cart-item="{{ item.product.id }}-{{ item.variant.id }}">
+                            <div class="cart-product-image">
+                                <a href="{% url 'product_detail' item.product.name|slugify %}">
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                </a>
+                            </div>
+
+                            <div class="cart-product-details">
+                                <a href="{% url 'product_detail' item.product.name|slugify %}" class="cart-product-name">{{ item.product.name }}</a>
+                                <p class="cart-product-brand">{{ item.product.brand }}</p>
+
+                                <p class="cart-product-size">
+                                    Size: {{ item.variant.size }} ml
+                                </p>
+
+                                <p class="cart-product-price">₹{{ item.price }}</p>
+                                {% if item.variant.active_offer %}<span class="product-offer-label">{{ item.variant.active_offer.discount_percent|floatformat:0 }}% OFF</span>{% endif %}
+                            </div>
+
+                            <div class="cart-quantity-box">
+                                          <a href="{% url 'cart_decrease' item.product.id item.variant.id %}"
+                                   class="qty-btn"
+                                              data-cart-quantity-action
+                                   aria-label="Decrease quantity">
+                                    −
+                                </a>
+                                          <span class="cart-item-quantity">{{ item.quantity }}</span>
+                                <a href="{% url 'cart_increase' item.product.id item.variant.id %}"
+                                   class="qty-btn"
+                                              data-cart-quantity-action
+                                   aria-label="Increase quantity">
+                                    +
+                                </a>
+                            </div>
+
+                            <div class="cart-subtotal-box">
+                                <span>Subtotal</span>
+                                <strong class="cart-item-subtotal">₹{{ item.subtotal }}</strong>
+                            </div>
+
+                            <div class="cart-remove-box">
+                                <a href="{% url 'cart_remove' item.product.id item.variant.id %}"
+                                   class="cart-remove-btn">
+                                    <i class="fa-solid fa-trash-can"></i> Remove
+                                </a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <aside class="cart-summary-panel">
+                    <div class="summary-card">
+                        <h3>Order Summary</h3>
+
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <strong class="cart-summary-subtotal">₹{{ cart.get_total_price }}</strong>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <strong>₹0</strong>
+                        </div>
+
+                        <div class="summary-divider"></div>
+
+                        <div class="summary-row total-row">
+                            <span>Total</span>
+                            <strong class="cart-summary-total">₹{{ cart.get_total_price }}</strong>
+                        </div>
+
+                        <div class="summary-actions">
+                            <a href="{% url 'checkout' %}" class="btn btn-checkout">Proceed to Checkout</a>
+                            <a href="{% url 'cart_clear' %}" class="btn btn-clear-cart">Clear Cart</a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        {% else %}
+            <div class="cart-empty-state">
+                <div class="empty-cart-icon">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                <h2>Your cart is empty</h2>
+                <p>Looks like you haven't added any fragrances yet.</p>
+                <a href="{% url 'shop' %}" class="btn btn-continue-shopping large-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Continue Shopping
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}

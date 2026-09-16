@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create Account - FragVerse
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-page-wrapper">
+    <div class="container auth-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-8 col-sm-10">
+                
+                <!-- Auth Card -->
+                <div class="auth-card premium-card">
+                    
+                    <!-- Header -->
+                    <div class="auth-header text-center">
+                        <h1 class="auth-title">Create Your Account</h1>
+                        <p class="auth-subtitle">Join FragVerse and discover your signature fragrance.</p>
+                    </div>
+
+                    <!-- Error Messages -->
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show auth-alert" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <i class="fas fa-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+
+                    <!-- Registration Form -->
+                    <form method="POST" class="auth-form">
+                        {% csrf_token %}
+
+                        <!-- First Name -->
+                        <div class="form-group auth-form-group">
+                            <label for="{{ form.first_name.id_for_label }}" class="auth-label">
+                                <i class="fas fa-user"></i> First Name
+                            </label>
+                            <input 
+                                type="text"
+                                name="first_name"
+                                class="form-control auth-input {% if form.first_name.errors %}is-invalid{% endif %}"
+                                placeholder="First Name"
+                                value="{{ form.first_name.value|default:'' }}"
+                                required
+                            >
+                            {% if form.first_name.errors %}
+                                <div class="invalid-feedback auth-error-message">
+                                    {% for error in form.first_name.errors %}
+                                        <i class="fas fa-times-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="form-group auth-form-group">
+                            <label for="{{ form.last_name.id_for_label }}" class="auth-label">
+                                <i class="fas fa-user"></i> Last Name
+                            </label>
+                            <input 
+                                type="text"
+                                name="last_name"
+                                class="form-control auth-input {% if form.last_name.errors %}is-invalid{% endif %}"
+                                placeholder="Last Name"
+                                value="{{ form.last_name.value|default:'' }}"
+                                required
+                            >
+                            {% if form.last_name.errors %}
+                                <div class="invalid-feedback auth-error-message">
+                                    {% for error in form.last_name.errors %}
+                                        <i class="fas fa-times-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group auth-form-group">
+                            <label for="{{ form.email.id_for_label }}" class="auth-label">
+                                <i class="fas fa-envelope"></i> Email Address
+                            </label>
+                            <input 
+                                type="email"
+                                name="email"
+                                class="form-control auth-input {% if form.email.errors %}is-invalid{% endif %}"
+                                placeholder="Email Address"
+                                value="{{ form.email.value|default:'' }}"
+                                required
+                            >
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback auth-error-message">
+                                    {% for error in form.email.errors %}
+                                        <i class="fas fa-times-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Username -->
+                        <div class="form-group auth-form-group">
+                            <label for="{{ form.username.id_for_label }}" class="auth-label">
+                                <i class="fas fa-at"></i> Username
+                            </label>
+                            <input 
+                                type="text"
+                                name="username"
+                                class="form-control auth-input {% if form.username.errors %}is-invalid{% endif %}"
+                                placeholder="Username"
+                                value="{{ form.username.value|default:'' }}"
+                                required
+                            >
+                            {% if form.username.errors %}
+                                <div class="invalid-feedback auth-error-message">
+                                    {% for error in form.username.errors %}
+                                        <i class="fas fa-times-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Mobile Number -->
+                        <div class="form-group auth-form-group">
+                            <label for="{{ form.phone.id_for_label }}" class="auth-label">
+                                <i class="fas fa-mobile-alt"></i> Mobile Number
+                            </label>
+                            <input 
+                                type="tel"
+                                name="phone"
+                                class="form-control auth-input {% if form.phone.errors %}is-invalid{% endif %}"
+                                placeholder="Mobile Number"
+                                value="{{ form.phone.value|default:'' }}"
+                                pattern="[0-9]{10}"
+                                required
+                            >
+                            <small class="auth-help-text">10-digit mobile number</small>
+                            {% if form.phone.errors %}
+                                <div class="invalid-feedback auth-error-message">
+                                    {% for error in form.phone.errors %}
+                                        <i class="fas fa-times-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-group auth-form-group">
+                            <label for="{{ form.password1.id_for_label }}" class="auth-label">
+                                <i class="fas fa-lock"></i> Password
+                            </label>
+                            <div class="auth-password-wrapper">
+                                <input 
+                                    type="password"
+                                    name="password1"
+                                    id="id_password1"
+                                    class="form-control auth-input {% if form.password1.errors %}is-invalid{% endif %}"
+                                    placeholder="Password"
+                                    required
+                                >
+                                <button 
+                                    type="button"
+                                    class="auth-password-toggle"
+                                    id="togglePassword1"
+                                    aria-label="Show password"
+                                >
+                                    <i class="fas fa-eye" id="eye1"></i>
+                                </button>
+                            </div>
+                            <small class="auth-help-text">
+                                Password must contain: At least 8 characters, uppercase, lowercase, number, special character
+                            </small>
+                            {% if form.password1.errors %}
+                                <div class="invalid-feedback auth-error-message">
+                                    {% for error in form.password1.errors %}
+                                        <i class="fas fa-times-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="form-group auth-form-group">
+                            <label for="{{ form.password2.id_for_label }}" class="auth-label">
+                                <i class="fas fa-lock-open"></i> Confirm Password
+                            </label>
+                            <div class="auth-password-wrapper">
+                                <input 
+                                    type="password"
+                                    name="password2"
+                                    id="id_password2"
+                                    class="form-control auth-input {% if form.password2.errors %}is-invalid{% endif %}"
+                                    placeholder="Confirm Password"
+                                    required
+                                >
+                                <button 
+                                    type="button"
+                                    class="auth-password-toggle"
+                                    id="togglePassword2"
+                                    aria-label="Show password"
+                                >
+                                    <i class="fas fa-eye" id="eye2"></i>
+                                </button>
+                            </div>
+                            {% if form.password2.errors %}
+                                <div class="invalid-feedback auth-error-message">
+                                    {% for error in form.password2.errors %}
+                                        <i class="fas fa-times-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn auth-submit-btn w-100">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="auth-divider">
+                        <span>Already have an account?</span>
+                    </div>
+
+                    <!-- Login Link -->
+                    <a href="{% url 'login' %}" class="auth-switch-link">
+                        <i class="fas fa-sign-in-alt"></i> Login Here
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Password Toggle Script -->
+<script>
+    function setupPasswordToggle(buttonId, inputId, iconId) {
+        const button = document.getElementById(buttonId);
+        const input = document.getElementById(inputId);
+        const icon = document.getElementById(iconId);
+
+        if (!button || !input || !icon) return;
+
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            icon.classList.toggle('fa-eye', !isPassword);
+            icon.classList.toggle('fa-eye-slash', isPassword);
+            button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+        });
+    }
+
+    // Initialize password toggles
+    setupPasswordToggle('togglePassword1', 'id_password1', 'eye1');
+    setupPasswordToggle('togglePassword2', 'id_password2', 'eye2');
+</script>
+
+{% endblock %}
+
