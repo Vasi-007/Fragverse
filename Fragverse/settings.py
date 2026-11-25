@@ -24,7 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-only-insecure-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() == 'true'
+render_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+_debug_setting = os.environ.get('DJANGO_DEBUG')
+DEBUG = (render_hostname is None) if _debug_setting is None else _debug_setting.lower() == 'true'
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -32,7 +34,6 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
-render_hostname = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if render_hostname and render_hostname not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(render_hostname)
 
